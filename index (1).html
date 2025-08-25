@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pengumuman Semifinal ICECO 2025</title>
+  <style>
+    :root {
+      --primary: #0b5ed7;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --success-bg: #d1e7dd;
+      --success-fg: #0f5132;
+      --danger-bg: #f8d7da;
+      --danger-fg: #842029;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      margin: 0; padding: 40px 16px;
+      color: #222;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(2,22,58,0.08);
+      padding: 28px;
+    }
+    h1 { margin: 0 0 8px; font-size: 26px; color: #0b2e63; }
+    .sub { margin: 0 0 20px; color: #4b5563; }
+    .grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+    .row { display: grid; gap: 12px; grid-template-columns: 1fr; }
+    @media (min-width: 640px) {
+      .row { grid-template-columns: 1fr 1fr; }
+    }
+    input, button, select {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      width: 100%;
+      font-size: 16px;
+    }
+    input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11,94,215,.15); }
+    button {
+      background: var(--primary); color: white; border: none; cursor: pointer; font-weight: 600;
+    }
+    button:hover { filter: brightness(1.05); }
+    .result {
+      margin-top: 18px; padding: 18px; border-radius: 12px; font-size: 16px; display:none;
+    }
+    .lolos { background: var(--success-bg); color: var(--success-fg); }
+    .tidak { background: var(--danger-bg); color: var(--danger-fg); }
+    .muted { color: #6b7280; font-size: 14px; }
+    .footer { text-align:center; margin-top: 22px; color:#6b7280; font-size: 14px; }
+    .caps { letter-spacing:.3px; font-weight:700; }
+    .badge { display:inline-block; padding:4px 10px; border-radius:999px; background:#eef2ff; color:#3730a3; font-size:12px; margin-left:8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Pengumuman Semifinal ICECO 2025 <span class="badge">Resmi</span></h1>
+      <p class="sub">Masukkan <b>Nama Peserta</b> dan <b>Asal Sekolah</b> untuk melihat status kelolosan.</p>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label for="nama" class="muted">Nama Peserta</label>
+            <input type="text" id="nama" placeholder="Contoh: AHMAD RAIHAN MU'AFA" autocomplete="off">
+          </div>
+          <div>
+            <label for="sekolah" class="muted">Asal Sekolah</label>
+            <input list="school-list" id="sekolah" placeholder="Contoh: MTs Sains Salahuddin Wahid" autocomplete="off">
+            <datalist id="school-list">
+              <option value="MTS DARUSSALAM NGESONG"></option><option value="MTS DARUSSALAM NGORO"></option><option value="MTS MADRASATUL QUR AN TEBUIRENG"></option><option value="MTS MADRASATUL QURAN TEBUIRENG"></option><option value="MTS SALAFIYAH SYAFI'IYAH TEBUIRENG"></option><option value="MTSN 2 KOTA KEDIRI"></option><option value="MTs Sains Salahuddin Wahid"></option><option value="MTs. Bahrul Ulum Genukwatu"></option><option value="SMP A WAHID HASYIM TEBUIRENG"></option><option value="SMP AL FURQON MQ TEBUIRENG"></option><option value="SMP AL-FITYAN TANGERANG"></option><option value="SMP ISLAM CENDEKIA HARAPAN"></option><option value="SMP Muhammadiyah Boarding School Jombang"></option><option value="SMP NEGERI 1 PAMEKASAN"></option><option value="SMP NEGERI 1 PETERONGAN"></option><option value="SMP PLUS JAUHARUL MAKNUUN"></option><option value="SMP SAINS TEBUIRENG"></option>
+            </datalist>
+          </div>
+        </div>
+        <div class="row">
+          <button id="btnCek">Cek Hasil</button>
+          <button id="btnReset" type="button" style="background:#6b7280">Reset</button>
+        </div>
+      </div>
+
+      <div id="hasil" class="result"></div>
+      <div class="footer">Kriteria: <span class="caps">5 nilai terendah</span> dinyatakan <b>TIDAK LOLOS</b>, lainnya <b>LOLOS</b>.</div>
+    </div>
+    <div class="footer">© ICECO 2025</div>
+  </div>
+
+  <script>
+    // === Data peserta (dibangkitkan dari Excel) ===
+    const dataPeserta = [
+  {
+    "nama": "KANZA PUTRI PRASETYO",
+    "sekolah": "MTS MADRASATUL QURAN TEBUIRENG",
+    "nilai": -26,
+    "status": "TIDAK LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD AKBAR HIDAYATULLOH",
+    "sekolah": "MTS MADRASATUL QUR AN TEBUIRENG",
+    "nilai": -23,
+    "status": "TIDAK LOLOS"
+  },
+  {
+    "nama": "Zahira Alfazazzahro",
+    "sekolah": "MTS MADRASATUL QUR AN TEBUIRENG",
+    "nilai": -15,
+    "status": "TIDAK LOLOS"
+  },
+  {
+    "nama": "AYDIN RAEGAN SULISTIHARDI",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": -8,
+    "status": "TIDAK LOLOS"
+  },
+  {
+    "nama": "Dewi zahrotul mufidah",
+    "sekolah": "MTs. Bahrul Ulum Genukwatu",
+    "nilai": -8,
+    "status": "TIDAK LOLOS"
+  },
+  {
+    "nama": "NAYLA RISMA AN-NAJIHA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": -7,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ALESHA FARZANA MAYZA",
+    "sekolah": "MTS DARUSSALAM NGESONG",
+    "nilai": -4,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD MAHMUD ALYYUDDIN",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": -3,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "RAEESA MAHESWARI ASHALINA",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": -3,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ROIHANAH",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": -2,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AHMAD RAIHAN MU'AFA",
+    "sekolah": "MTS MADRASATUL QUR AN TEBUIRENG",
+    "nilai": -2,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ALIZA NAZWA SEPTYANA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 1,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "RAYHAN FALIH ATHAYA",
+    "sekolah": "SMP PLUS JAUHARUL MAKNUUN",
+    "nilai": 3,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AFIQAH RAQILLA FAYZA",
+    "sekolah": "SMP ISLAM CENDEKIA HARAPAN",
+    "nilai": 3,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD NASHRUL ARIF ALFATIH",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 3,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "HAIKAL ABIYU FARRAS WAHONO",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 4,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "HANIFAH KAYLA HARDIYANTI",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 4,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ABDULLOH KAFAABIH AKBAR",
+    "sekolah": "MTS DARUSSALAM NGESONG",
+    "nilai": 5,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "DAYITA BUTSAINA",
+    "sekolah": "MTSN 2 KOTA KEDIRI",
+    "nilai": 6,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ALIFA FATHIYYATURAHMA CHOLIS",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 7,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ARIFATUL KARIMAH",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 7,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AL FARISU SYAHIDU PUNTADEWA",
+    "sekolah": "MTS MADRASATUL QUR AN TEBUIRENG",
+    "nilai": 7,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AULIYA RAISYA RAHMA",
+    "sekolah": "SMP NEGERI 1 PETERONGAN",
+    "nilai": 10,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD YUSUF AKBAR MABRURI ARFITRA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 10,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AUFA NUR RAHMA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 10,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "Brilliant Agnes Ramadhani",
+    "sekolah": "MTs Sains Salahuddin Wahid",
+    "nilai": 11,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ROGHIB MUSTOFA",
+    "sekolah": "SMP AL FURQON MQ TEBUIRENG",
+    "nilai": 11,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "KIRANA NURI MUDIA",
+    "sekolah": "MTS DARUSSALAM NGESONG",
+    "nilai": 12,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "Azalea Fathin Dhiyaulhaq",
+    "sekolah": "MTs Sains Salahuddin Wahid",
+    "nilai": 12,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "Qonita billah izza syifahana",
+    "sekolah": "MTs. Bahrul Ulum Genukwatu",
+    "nilai": 12,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "SATRIA WIJAYA PRASETYA",
+    "sekolah": "SMP A WAHID HASYIM TEBUIRENG",
+    "nilai": 13,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "FAHIRA AZKA SYAUQA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 15,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AULIA RAMADHANI PUTRI",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 15,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ZIFANA ZULFI AULIA",
+    "sekolah": "MTS DARUSSALAM NGESONG",
+    "nilai": 15,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "JIHAN AINURROKHMAH",
+    "sekolah": "SMP NEGERI 1 PETERONGAN",
+    "nilai": 16,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUTIARA IFFAH WIBOWO",
+    "sekolah": "SMP A WAHID HASYIM TEBUIRENG",
+    "nilai": 16,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD AZMI HUSNUDDIN",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 16,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AHMAD HISYAM ATHA LAYANA ARAYA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 17,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD IRFAN MAULANA",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 18,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MOCHAMMAD AZZAM FAHRIEZAL PUTRA",
+    "sekolah": "SMP AL FURQON MQ TEBUIRENG",
+    "nilai": 18,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "Ailka Carissa Azkiya",
+    "sekolah": "SMP AL-FITYAN TANGERANG",
+    "nilai": 20,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "HISYAM PRIBADI PINARING GUSTI",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 22,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MOH. RAFAILAH RAFARDHAN",
+    "sekolah": "SMP NEGERI 1 PAMEKASAN",
+    "nilai": 23,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AISYAH LAALI ADZKIYA ASLAF",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 25,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "Hakesha Atalla",
+    "sekolah": "SMP Muhammadiyah Boarding School Jombang",
+    "nilai": 25,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AUFA FI'AL FIDIANSYAH",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 27,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "RAFKA ZIDAN ALFARISY",
+    "sekolah": "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG",
+    "nilai": 28,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "MUHAMMAD FAUZAN GRIVAN RAMADHAN",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 28,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "ACHMAD ASSHIDQI",
+    "sekolah": "SMP A WAHID HASYIM TEBUIRENG",
+    "nilai": 28,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "CAESAR NARENDRA FARSHAD A.C",
+    "sekolah": "SMP ISLAM CENDEKIA HARAPAN",
+    "nilai": 28,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "NAZIL QINAN AL HASAN",
+    "sekolah": "SMP NEGERI 1 PAMEKASAN",
+    "nilai": 29,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "VIRA ANGGRAINI",
+    "sekolah": "MTS DARUSSALAM NGESONG",
+    "nilai": 33,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "Noura Aziza Hidayati",
+    "sekolah": "MTs Sains Salahuddin Wahid",
+    "nilai": 37,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "GHAISAN DZAKI ARROSYID",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 38,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "AHMAD MIKHAIL ABDURRAHMAN",
+    "sekolah": "SMP AL FURQON MQ TEBUIRENG",
+    "nilai": 40,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "INNA MAR'ATA WAHYU LAILI",
+    "sekolah": "MTS DARUSSALAM NGORO",
+    "nilai": 43,
+    "status": "LOLOS"
+  },
+  {
+    "nama": "LANGIT NUSANTARA ARKANTERA",
+    "sekolah": "SMP SAINS TEBUIRENG",
+    "nilai": 44,
+    "status": "LOLOS"
+  }
+];
+
+    // Helper normalisasi agar pencarian toleran (huruf besar/kecil, spasi, tanda baca)
+    const norm = (s) => (s || "")
+      .normalize('NFKD')
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, '')  // buang tanda baca
+      .replace(/\s+/g, ' ')                    // rapikan spasi
+      .trim();
+
+    function cariPeserta(namaRaw, sekolahRaw) {
+      const nNama = norm(namaRaw);
+      const nSek = norm(sekolahRaw);
+
+      if (!nNama || !nSek) return null;
+
+      // 1) Coba match eksak (setelah normalisasi)
+      let p = dataPeserta.find(x => norm(x.nama) === nNama && norm(x.sekolah) === nSek);
+      if (p) return p;
+
+      // 2) Coba match nama eksak + sekolah mengandung (lebih toleran)
+      const kandidat = dataPeserta.filter(x => norm(x.nama) === nNama && norm(x.sekolah).includes(nSek));
+      if (kandidat.length === 1) return kandidat[0];
+
+      // 3) Jika masih tidak ada, coba nama mengandung + sekolah mengandung dan unik
+      const kandidat2 = dataPeserta.filter(x => norm(x.nama).includes(nNama) && norm(x.sekolah).includes(nSek));
+      if (kandidat2.length === 1) return kandidat2[0];
+
+      return null;
+    }
+
+    const hasilDiv = document.getElementById('hasil');
+    const btn = document.getElementById('btnCek');
+    const btnReset = document.getElementById('btnReset');
+    const inputNama = document.getElementById('nama');
+    const inputSek = document.getElementById('sekolah');
+
+    function tampilkan(p) {
+      hasilDiv.style.display = 'block';
+      if (!p) {
+        hasilDiv.className = 'result';
+        hasilDiv.innerHTML = 'Data peserta tidak ditemukan. Mohon periksa kembali input Anda (ejaan nama & sekolah).';
+        return;
+      }
+      const kelas = p.status === 'LOLOS' ? 'result lolos' : 'result tidak';
+      hasilDiv.className = kelas;
+      hasilDiv.innerHTML = `
+        <div><strong>${p.status === 'LOLOS' ? 'SELAMAT!' : 'MOHON MAAF.'}</strong></div>
+        <div style="margin-top:6px">${p.nama}</div>
+        <div class="muted">${p.sekolah}</div>
+        <div style="margin-top:10px">Nilai: <b>${p.nilai}</b></div>
+        <div style="margin-top:6px">Status: <b>${p.status}</b></div>
+        <div style="margin-top:12px"><button onclick="window.print()">Cetak Bukti</button></div>
+      `;
+    }
+
+    btn.addEventListener('click', () => {
+      tampilkan(cariPeserta(inputNama.value, inputSek.value));
+    });
+
+    btnReset.addEventListener('click', () => {
+      inputNama.value = '';
+      inputSek.value = '';
+      hasilDiv.style.display = 'none';
+    });
+
+    // Enter untuk submit
+    [inputNama, inputSek].forEach(el => el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btn.click();
+    }));
+  </script>
+</body>
+</html>
