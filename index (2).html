@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman Kelulusan ICECO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            padding: 50px 20px;
+        }
+        img.logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+            width: 250px;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 40px;
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+        }
+        .lulus {
+            background-color: #007BFF; /* biru */
+        }
+        .tidak-lulus {
+            background-color: #DC3545; /* merah */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png.png" alt="ICECO Logo" class="logo">
+        <h1>Pengumuman Kelulusan ICECO</h1>
+        <p>Masukkan nama dan asal sekolah Anda:</p>
+        <input type="text" id="nama" placeholder="Nama Lengkap">
+        <br>
+        <input type="text" id="asal" placeholder="Asal Sekolah">
+        <br>
+        <button onclick="cekKelulusan()">Cek Kelulusan</button>
+        <div id="hasil" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const dataPeserta = [
+            {nama: "AL FARISU SYAHIDU PUNTADEWA", sekolah: "MTS MADRASATUL QUR AN TEBUIRENG", keterangan: "LULUS"},
+            {nama: "Zahira Alfazazzahro", sekolah: "MTS MADRASATUL QUR AN TEBUIRENG", keterangan: "TIDAK LULUS"},
+            {nama: "MUHAMMAD AKBAR HIDAYATULLOH", sekolah: "MTS MADRASATUL QUR AN TEBUIRENG", keterangan: "TIDAK LULUS"},
+            {nama: "Hakesha Atalla", sekolah: "SMP Muhammadiyah Boarding School Jombang", keterangan: "LULUS"},
+            {nama: "Noura Aziza Hidayati", sekolah: "MTs Sains Salahuddin Wahid", keterangan: "LULUS"},
+            {nama: "Azalea Fathin Dhiyaulhaq", sekolah: "MTs Sains Salahuddin Wahid", keterangan: "LULUS"},
+            {nama: "Brilliant Agnes Ramadhani", sekolah: "MTs Sains Salahuddin Wahid", keterangan: "LULUS"},
+            {nama: "Qonita billah izza syifahana", sekolah: "MTs. Bahrul Ulum Genukwatu", keterangan: "LULUS"},
+            {nama: "Dewi zahrotul mufidah", sekolah: "MTs. Bahrul Ulum Genukwatu", keterangan: "TIDAK LULUS"},
+            {nama: "ACHMAD ASSHIDQI", sekolah: "SMP A WAHID HASYIM TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUTIARA IFFAH WIBOWO", sekolah: "SMP A WAHID HASYIM TEBUIRENG", keterangan: "LULUS"},
+            {nama: "SATRIA WIJAYA PRASETYA", sekolah: "SMP A WAHID HASYIM TEBUIRENG", keterangan: "LULUS"},
+            {nama: "CAESAR NARENDRA FARSHAD A.C", sekolah: "SMP ISLAM CENDEKIA HARAPAN", keterangan: "LULUS"},
+            {nama: "AFIQAH RAQILLA FAYZA", sekolah: "SMP ISLAM CENDEKIA HARAPAN", keterangan: "LULUS"},
+            {nama: "NAZIL QINAN AL HASAN", sekolah: "SMP NEGERI 1 PAMEKASAN", keterangan: "LULUS"},
+            {nama: "MOH. RAFAILAH RAFARDHAN", sekolah: "SMP NEGERI 1 PAMEKASAN", keterangan: "LULUS"},
+            {nama: "JIHAN AINURROKHMAH", sekolah: "SMP NEGERI 1 PETERONGAN", keterangan: "LULUS"},
+            {nama: "AULIYA RAISYA RAHMA", sekolah: "SMP NEGERI 1 PETERONGAN", keterangan: "LULUS"},
+            {nama: "Ailka Carissa Azkiya", sekolah: "SMP AL-FITYAN TANGERANG", keterangan: "LULUS"},
+            {nama: "VIRA ANGGRAINI", sekolah: "MTS DARUSSALAM NGESONG", keterangan: "LULUS"},
+            {nama: "ZIFANA ZULFI AULIA", sekolah: "MTS DARUSSALAM NGESONG", keterangan: "LULUS"},
+            {nama: "KIRANA NURI MUDIA", sekolah: "MTS DARUSSALAM NGESONG", keterangan: "LULUS"},
+            {nama: "ABDULLOH KAFAABIH AKBAR", sekolah: "MTS DARUSSALAM NGESONG", keterangan: "LULUS"},
+            {nama: "ALESHA FARZANA MAYZA", sekolah: "MTS DARUSSALAM NGESONG", keterangan: "LULUS"},
+            {nama: "INNA MAR'ATA WAHYU LAILI", sekolah: "MTS DARUSSALAM NGORO", keterangan: "LULUS"},
+            {nama: "KANZA PUTRI PRASETYO", sekolah: "MTS MADRASATUL QURAN TEBUIRENG", keterangan: "TIDAK LULUS"},
+            {nama: "RAFKA ZIDAN ALFARISY", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "AUFA FI'AL FIDIANSYAH", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "AISYAH LAALI ADZKIYA ASLAF", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "HISYAM PRIBADI PINARING GUSTI", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUHAMMAD IRFAN MAULANA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "AHMAD HISYAM ATHA LAYANA ARAYA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "FAHIRA AZKA SYAUQA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "AUFA NUR RAHMA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUHAMMAD YUSUF AKBAR MABRURI ARFITRA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "ARIFATUL KARIMAH", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUHAMMAD NASHRUL ARIF ALFATIH", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "ALIZA NAZWA SEPTYANA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUHAMMAD MAHMUD ALYYUDDIN", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "LULUS"},
+            {nama: "NAYLA RISMA AN-NAJIHA", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "TIDAK LULUS"},
+            {nama: "AYDIN RAEGAN SULISTIHARDI", sekolah: "MTS SALAFIYAH SYAFI'IYAH TEBUIRENG", keterangan: "TIDAK LULUS"},
+            {nama: "DAYITA BUTSAINA", sekolah: "MTSN 2 KOTA KEDIRI", keterangan: "LULUS"},
+            {nama: "AHMAD MIKHAIL ABDURRAHMAN", sekolah: "SMP AL FURQON MQ TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MOCHAMMAD AZZAM FAHRIEZAL PUTRA", sekolah: "SMP AL FURQON MQ TEBUIRENG", keterangan: "LULUS"},
+            {nama: "ROGHIB MUSTOFA", sekolah: "SMP AL FURQON MQ TEBUIRENG", keterangan: "LULUS"},
+            {nama: "RAYHAN FALIH ATHAYA", sekolah: "SMP PLUS JAUHARUL MAKNUUN", keterangan: "LULUS"},
+            {nama: "LANGIT NUSANTARA ARKANTERA", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "GHAISAN DZAKI ARROSYID", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUHAMMAD FAUZAN GRIVAN RAMADHAN", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "MUHAMMAD AZMI HUSNUDDIN", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "AULIA RAMADHANI PUTRI", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "ALIFA FATHIYYATURAHMA CHOLIS", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "HAIKAL ABIYU FARRAS WAHONO", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "HANIFAH KAYLA HARDIYANTI", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "ROIHANAH", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"},
+            {nama: "RAEESA MAHESWARI ASHALINA", sekolah: "SMP SAINS TEBUIRENG", keterangan: "LULUS"}
+        ];
+
+        function cekKelulusan() {
+            const namaInput = document.getElementById('nama').value.trim().toUpperCase();
+            const asalInput = document.getElementById('asal').value.trim().toUpperCase();
+            const hasilDiv = document.getElementById('hasil');
+
+            const peserta = dataPeserta.find(p => p.nama.toUpperCase() === namaInput && p.sekolah.toUpperCase() === asalInput);
+
+            if (peserta) {
+                if (peserta.keterangan === "LULUS") {
+                    hasilDiv.className = "result lulus";
+                    hasilDiv.innerHTML = `Selamat, Anda <b>LULUS</b> ke semifinal!<br>Sampai bertemu di SMA TRENSAINS TEBUIRENG`;
+                } else {
+                    hasilDiv.className = "result tidak-lulus";
+                    hasilDiv.innerHTML = `Mohon maaf, Anda <b>TIDAK LULUS</b> semifinal.<br>Tetap semangat dan pantang menyerah.`;
+                }
+            } else {
+                hasilDiv.className = "result tidak-lulus";
+                hasilDiv.innerHTML = "Data tidak ditemukan. Pastikan nama dan asal sekolah Anda benar.";
+            }
+
+            hasilDiv.style.display = "block";
+        }
+    </script>
+</body>
+</html>
